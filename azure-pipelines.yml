@@ -3,7 +3,6 @@ trigger: none
 name: $(BuildDefinitionName)-$(BuildNumber)$(Rev:.r)
 
 variables:
-
 - name: ProjectFile
   value: PWAApplication
 
@@ -15,30 +14,34 @@ stages:
   - job: BuildJob
     displayName: "Build Job"
 
-  steps:
-  
+    steps:
+
     - task: NodeTool@0
       displayName: Install NodeJS
       inputs:
         versionSpec: '18.13.0'
+
     - task: CmdLine@2
       inputs:
         script: |
           npm config list
           npm config ls -l
+
     - task: Npm@1
       displayName: 'Install'
       inputs:
         command: 'custom'
         workingDir: '$(Build.SourcesDirectory)'
         customCommand: 'install --force'
+
     - task: CmdLine@2
       inputs:
-        script: 'set NODE_OPTIONS: --max_old_space_size=16384'
+        script: |
+          set NODE_OPTIONS=--max_old_space_size=16384
+
     - task: Npm@1
       displayName: build
       inputs:
         command: 'custom'
         workingDir: '$(Build.SourcesDirectory)'
         customCommand: 'run build'
-
