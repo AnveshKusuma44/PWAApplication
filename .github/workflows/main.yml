@@ -5,7 +5,6 @@ on:
 
 jobs:
   build:
-    name: Build Job
     runs-on: ubuntu-latest
 
     env:
@@ -20,7 +19,6 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18.13.0'
-        cache: 'npm'
 
     - name: Check npm config
       run: |
@@ -28,7 +26,7 @@ jobs:
         npm config ls -l
 
     - name: Install Dependencies
-      run: npm ci
+      run: npm install --force
 
     - name: Build Application
       run: npm run build
