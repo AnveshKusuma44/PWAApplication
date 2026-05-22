@@ -30,3 +30,13 @@ jobs:
 
     - name: Build Application
       run: npm run build
+
+    # Upload build artifact
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifact
+        path: |
+          dist
+          build
+        if-no-files-found: warn
