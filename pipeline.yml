@@ -1,0 +1,65 @@
+trigger:
+- dev
+
+name: $(BuildDefinitionName)-$(Build.BuildNumber)
+
+parameters:
+- name: nodeVersionSpec
+  type: string
+  default: '20.x'
+
+variables:
+- name: BuildConfiguration
+  value: Release
+
+- name: NodeWorkingDirectory
+  value: $(Build.SourcesDirectory)
+
+- name: NodeDistFolder
+  value: $(Build.SourcesDirectory)/dist/pwaapplication/browser
+
+- name: ArtifactName
+  value: drop
+
+- name: NODE_OPTIONS
+  value: --max_old_space_size=16384
+
+stages:
+- stage: Build
+  jobs:
+  - job: AngularBuild
+    pool:
+      vmImage: windows-latest
+
+    steps:
+
+    - task: NodeTool@0
+      displayName: Install Node.js
+      inputs:
+        versionSpec: ${{ parameters.nodeVersionSpec }}
+
+    - script: |
+        node -v
+        npm -v
+      displayName: Check versions
+
+    - task: Npm@1
+      displayName: Install packages
+      inputs:
+        command: custom
+        workingDir: $(NodeWorkingDirectory)
+        customCommand: install --force
+
+    - task: Npm@1
+      displayName: Build Angular App
+      inputs:
+        command: custom
+        workingDir: $(NodeWorkingDirectory)
+        customCommand: run build
+
+    - task: PublishBuildArtifacts@1
+      displayName: Publish Artifact
+      inputs:
+        PathtoPublish: $(NodeDistFolder)
+        ArtifactName: $(ArtifactName)
+        publishLocation: Container
